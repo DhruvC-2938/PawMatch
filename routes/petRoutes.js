@@ -9,8 +9,8 @@ const {
     searchPets
 } = require("../controllers/petController");
 
-const { protect } = require("../middleware/authMiddleware");
-const { authorizeRole } = require("../middleware/roleMiddleware");
+const protect = require("../middleware/authMiddleware");
+const authorizeRole = require("../middleware/roleMiddleware");
 const { validateRequiredFields } = require("../middleware/validationMiddleware");
 
 const router = express.Router();

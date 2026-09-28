@@ -4,8 +4,8 @@ const {
     createShelter
 } = require("../controllers/shelterController");
 
-const { protect } = require("../middleware/authMiddleware");
-const { authorizeRole } = require("../middleware/roleMiddleware");
+const protect = require("../middleware/authMiddleware");
+const authorizeRole = require("../middleware/roleMiddleware");
 
 const router = express.Router();
 
