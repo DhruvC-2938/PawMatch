@@ -1,5 +1,6 @@
 const Pet = require("../models/Pet");
 
+// Create a pet
 const createPet = async (req, res) => {
     try {
         const {
@@ -12,13 +13,6 @@ const createPet = async (req, res) => {
             shelterId
         } = req.body;
 
-        let photoUrl = "";
-
-        // If an image was uploaded
-        if (req.file) {
-            photoUrl = `/uploads/${req.file.filename}`;
-        }
-
         const pet = await Pet.create({
             name,
             species,
@@ -26,7 +20,6 @@ const createPet = async (req, res) => {
             age,
             gender,
             description,
-            photoUrl,
             shelterId
         });
 
@@ -34,7 +27,6 @@ const createPet = async (req, res) => {
             message: "Pet created successfully",
             pet
         });
-
     } catch (error) {
         res.status(500).json({
             message: "Error creating pet",
@@ -43,6 +35,7 @@ const createPet = async (req, res) => {
     }
 };
 
+// Get all pets
 const getPets = async (req, res) => {
     try {
         const pets = await Pet.find();
@@ -50,41 +43,40 @@ const getPets = async (req, res) => {
         res.status(200).json({
             success: true,
             count: pets.length,
-            pets,
+            pets
         });
     } catch (error) {
         res.status(500).json({
-            success: false,
-            message: "Failed to fetch pets",
-            error: error.message,
+            message: "Error fetching pets",
+            error: error.message
         });
     }
 };
 
+// Get pet by ID
 const getPetById = async (req, res) => {
     try {
         const pet = await Pet.findById(req.params.id);
 
         if (!pet) {
             return res.status(404).json({
-                success: false,
-                message: "Pet not found",
+                message: "Pet not found"
             });
         }
 
         res.status(200).json({
             success: true,
-            pet,
+            pet
         });
     } catch (error) {
         res.status(500).json({
-            success: false,
-            message: "Failed to fetch pet",
-            error: error.message,
+            message: "Error fetching pet",
+            error: error.message
         });
     }
 };
 
+// Update pet
 const updatePet = async (req, res) => {
     try {
         const pet = await Pet.findByIdAndUpdate(
@@ -92,63 +84,60 @@ const updatePet = async (req, res) => {
             req.body,
             {
                 new: true,
-                runValidators: true,
+                runValidators: true
             }
         );
 
         if (!pet) {
             return res.status(404).json({
-                success: false,
-                message: "Pet not found",
+                message: "Pet not found"
             });
         }
 
         res.status(200).json({
             success: true,
-            message: "Pet updated successfully",
-            pet,
+            pet
         });
     } catch (error) {
         res.status(500).json({
-            success: false,
-            message: "Failed to update pet",
-            error: error.message,
+            message: "Error updating pet",
+            error: error.message
         });
     }
 };
 
+// Delete pet
 const deletePet = async (req, res) => {
     try {
         const pet = await Pet.findByIdAndDelete(req.params.id);
 
         if (!pet) {
             return res.status(404).json({
-                success: false,
-                message: "Pet not found",
+                message: "Pet not found"
             });
         }
 
         res.status(200).json({
             success: true,
             message: "Pet deleted successfully",
-            pet,
+            pet
         });
     } catch (error) {
         res.status(500).json({
-            success: false,
-            message: "Failed to delete pet",
-            error: error.message,
+            message: "Error deleting pet",
+            error: error.message
         });
     }
 };
+
+// Search pets
 const searchPets = async (req, res) => {
     try {
         const { keyword } = req.query;
 
         if (!keyword) {
             return res.status(400).json({
-                success: false,
-                message: "Keyword is required",
+                message: "Keyword is required"
             });
         }
 
@@ -156,20 +145,19 @@ const searchPets = async (req, res) => {
             $or: [
                 { name: { $regex: keyword, $options: "i" } },
                 { species: { $regex: keyword, $options: "i" } },
-                { breed: { $regex: keyword, $options: "i" } },
-            ],
+                { breed: { $regex: keyword, $options: "i" } }
+            ]
         });
 
         res.status(200).json({
             success: true,
             count: pets.length,
-            pets,
+            pets
         });
     } catch (error) {
         res.status(500).json({
-            success: false,
-            message: "Search failed",
-            error: error.message,
+            message: "Error searching pets",
+            error: error.message
         });
     }
 };
@@ -180,5 +168,5 @@ module.exports = {
     getPetById,
     updatePet,
     deletePet,
-    searchPets,
+    searchPets
 };

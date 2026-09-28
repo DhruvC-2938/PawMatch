@@ -1,5 +1,4 @@
 const express = require("express");
-const router = express.Router();
 
 const {
     createPet,
@@ -10,17 +9,18 @@ const {
     searchPets
 } = require("../controllers/petController");
 
-const upload = require("../middleware/uploadMiddleware");
+const { protect } = require("../middleware/authMiddleware");
+const { authorizeRole } = require("../middleware/roleMiddleware");
+const { validateRequiredFields } = require("../middleware/validationMiddleware");
 
-const {
-    validateRequiredFields
-} = require("../middleware/validationMiddleware");
+const router = express.Router();
 
-
-// CREATE PET
+// Create a pet
+// Only authenticated shelter users can create pets
 router.post(
     "/",
-    upload.single("photo"),
+    protect,
+    authorizeRole("shelter"),
     validateRequiredFields([
         "name",
         "species",
@@ -32,26 +32,32 @@ router.post(
     createPet
 );
 
-
-// GET ALL PETS
+// Get all pets
 router.get("/", getPets);
 
-
-// SEARCH PETS
-// IMPORTANT: keep this before /:id
+// Search pets
+// Keep this BEFORE /:id
 router.get("/search", searchPets);
 
-
-// GET PET BY ID
+// Get pet by ID
 router.get("/:id", getPetById);
 
+// Update pet
+// Only authenticated shelter users can update pets
+router.put(
+    "/:id",
+    protect,
+    authorizeRole("shelter"),
+    updatePet
+);
 
-// UPDATE PET
-router.put("/:id", updatePet);
-
-
-// DELETE PET
-router.delete("/:id", deletePet);
-
+// Delete pet
+// Only authenticated shelter users can delete pets
+router.delete(
+    "/:id",
+    protect,
+    authorizeRole("shelter"),
+    deletePet
+);
 
 module.exports = router;

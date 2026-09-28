@@ -4,45 +4,42 @@ const petSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: true,
+            required: true
         },
 
         species: {
             type: String,
-            required: true,
+            required: true
         },
 
         breed: {
             type: String,
-            required: true,
+            required: true
         },
 
         age: {
             type: Number,
-            required: true,
+            required: true
         },
 
         gender: {
             type: String,
-            required: true,
+            required: true
         },
 
         description: {
             type: String,
-        },
-
-        photoUrl: {
-            type: String,
+            default: ""
         },
 
         shelterId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Shelter",
-            required: true,
-        },
+            required: true
+        }
     },
     {
-        timestamps: true,
+        timestamps: true
     }
 );
 
