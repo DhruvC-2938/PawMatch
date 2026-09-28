@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Pet = require("../models/Pet");
 
 // Create a pet
@@ -56,6 +57,12 @@ const getPets = async (req, res) => {
 // Get pet by ID
 const getPetById = async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                message: "Invalid pet ID"
+            });
+        }
+
         const pet = await Pet.findById(req.params.id);
 
         if (!pet) {
@@ -79,6 +86,12 @@ const getPetById = async (req, res) => {
 // Update pet
 const updatePet = async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                message: "Invalid pet ID"
+            });
+        }
+
         const pet = await Pet.findByIdAndUpdate(
             req.params.id,
             req.body,
@@ -109,6 +122,12 @@ const updatePet = async (req, res) => {
 // Delete pet
 const deletePet = async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                message: "Invalid pet ID"
+            });
+        }
+
         const pet = await Pet.findByIdAndDelete(req.params.id);
 
         if (!pet) {
@@ -129,7 +148,6 @@ const deletePet = async (req, res) => {
         });
     }
 };
-
 // Search pets
 const searchPets = async (req, res) => {
     try {
