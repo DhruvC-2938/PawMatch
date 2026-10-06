@@ -22,6 +22,21 @@ In traditional pet adoption workflows, shelters often manage animal profiles and
 
 ---
 
+## 📖 Interactive API Documentation (Swagger UI)
+
+PawMatch includes an interactive **OpenAPI 3.0** documentation and testing sandbox powered by Swagger UI.
+
+* **Live Interactive Docs:** `http://localhost:5000/api-docs` (when running locally)
+* **OpenAPI Spec File:** [`swagger.json`](./swagger.json)
+
+### Testing Protected Endpoints in Swagger:
+1. Call `POST /api/auth/login` to obtain your JWT token.
+2. Click the green **Authorize 🔓** button at the top-right of the Swagger page.
+3. Paste the token as `Bearer <your_token>` and click **Authorize**.
+4. You can now execute and test all authenticated and shelter-only endpoints directly in your browser.
+
+---
+
 ## 🏗 How the System Works (End-to-End Architecture)
 
 PawMatch is structured around a classic Model-View-Controller (MVC) REST pattern backed by MongoDB Atlas and a hybrid authentication system.
