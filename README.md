@@ -210,7 +210,7 @@ PORT=5000
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/pawmatch?retryWrites=true&w=majority
 
 # Web API Key from Firebase Console (Project Settings -> General -> Web API Key)
-FIREBASE_API_KEY=AIzaSyA1234567890abcdefghijklmnopqrstuv
+FIREBASE_API_KEY=**************
 
 # Secret string used to sign and verify backend JWT tokens
 JWT_SECRET=your_long_random_secure_jwt_secret_string
