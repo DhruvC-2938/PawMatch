@@ -9,8 +9,6 @@ const authorizeRole = require("../middleware/roleMiddleware");
 
 const router = express.Router();
 
-// Create a shelter
-// Only authenticated shelter users can create shelters
 router.post(
     "/",
     protect,

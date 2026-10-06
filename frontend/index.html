@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PawMatch — Pet Adoption Platform</title>
+  <meta name="description" content="PawMatch is a multi-shelter pet adoption platform connecting shelters with loving adopters.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="#home" class="brand" id="nav-brand-logo" data-route="home">
+        <span class="brand-paw">🐾</span>
+        <span class="brand-text">PawMatch</span>
+      </a>
+
+      <nav class="nav-menu">
+        <a href="#home" class="nav-item" id="nav-home-link" data-route="home">Home</a>
+        <a href="#pets" class="nav-item" data-route="pets">Find Pets</a>
+        <a href="#dashboard" class="nav-item" id="nav-dashboard-link" data-route="dashboard">Dashboard</a>
+        <a href="#my-applications" class="nav-item hidden" id="nav-my-apps-link" data-route="my-applications">My Applications</a>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- API Connection Pill -->
+        <button id="api-toggle-btn" class="api-pill" title="Backend API settings">
+          <span class="api-dot online" id="api-dot"></span>
+          <span id="api-name">API :5000</span>
+        </button>
+
+        <!-- Unauthenticated links -->
+        <div id="nav-auth-logged-out" class="auth-group">
+          <a href="#login" class="btn btn-ghost" data-route="login">Log In</a>
+          <a href="#register" class="btn btn-primary" data-route="register">Sign Up</a>
+        </div>
+
+        <!-- Authenticated menu -->
+        <div id="nav-auth-logged-in" class="user-pill hidden">
+          <div class="user-avatar" id="nav-user-avatar">U</div>
+          <div class="user-meta">
+            <span class="user-name" id="nav-user-name">User</span>
+            <span class="user-role-tag" id="nav-user-role">adopter</span>
+          </div>
+          <button id="logout-btn" class="btn-logout" title="Log Out">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Views Container -->
+  <main>
+
+    <!-- VIEW 1: HOME PAGE -->
+    <section class="page" data-page="home">
+      <div class="hero-section">
+        <div class="hero-content">
+          <div class="eyebrow-badge">
+            <span class="badge-dot"></span>
+            <span>Give every animal a second chance</span>
+          </div>
+          <h1 class="hero-title">
+            Find your new<br>
+            <em>best friend.</em>
+          </h1>
+          <p class="hero-lead">
+            PawMatch unites independent animal shelters and pet adopters in one connected platform. Discover loving pets, submit adoption requests, and welcome home a new family member.
+          </p>
+          <div class="hero-cta-group">
+            <a href="#pets" class="btn btn-primary btn-lg" data-route="pets">
+              <span>Explore Available Pets</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+            <a href="#register" class="btn btn-outline btn-lg" data-route="register">Join as Shelter or Adopter</a>
+          </div>
+
+          <div class="hero-stats-row">
+            <div class="hero-stat-item">
+              <span class="hero-stat-number" id="home-pet-count">...</span>
+              <span class="hero-stat-label">Pets Listed</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat-item">
+              <span class="hero-stat-number" id="home-shelter-count">Multiple</span>
+              <span class="hero-stat-label">Verified Shelters</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat-item">
+              <span class="hero-stat-number">100%</span>
+              <span class="hero-stat-label">Direct Impact</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-media-wrap">
+          <div class="hero-photo-card">
+            <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=900&q=85" alt="Golden Retriever looking forward" class="hero-photo">
+            <div class="hero-photo-tag">
+              <div class="photo-tag-avatar">
+                <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=120&h=120&q=80" alt="Dog avatar">
+              </div>
+              <div class="photo-tag-info">
+                <strong>Bruno</strong>
+                <small>Golden Retriever • 2 yrs</small>
+              </div>
+              <span class="photo-tag-badge">Adoptable</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How it Works Section -->
+      <section class="how-section container">
+        <div class="section-header-center">
+          <span class="eyebrow-text">Simple & Transparent</span>
+          <h2>How PawMatch Works</h2>
+          <p>Connecting shelters and adopters with an intuitive, step-by-step adoption process.</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number">01</div>
+            <div class="step-photo-preview">
+              <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=400&q=80" alt="Dog sniffing nature">
+            </div>
+            <h3>Browse & Search</h3>
+            <p>Explore pets listed by verified rescue shelters. Filter by species like dogs, cats, rabbits, and birds.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">02</div>
+            <div class="step-photo-preview">
+              <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=400&q=80" alt="Cute curious cat">
+            </div>
+            <h3>Submit Application</h3>
+            <p>Share your home environment and love for animals with a quick, transparent adoption application.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">03</div>
+            <div class="step-photo-preview">
+              <img src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=400&q=80" alt="Dog and human enjoying time">
+            </div>
+            <h3>Shelter Review & Adoption</h3>
+            <p>The shelter directly reviews applications in their workspace, updates statuses, and arranges the match.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- VIEW 2: BROWSE & SEARCH PETS -->
+    <section class="page hidden" data-page="pets">
+      <div class="pets-header-banner">
+        <div class="container">
+          <div class="eyebrow-badge">
+            <span class="badge-dot"></span>
+            <span>Real photos • Verified shelters</span>
+          </div>
+          <h1>Find your furry companion</h1>
+          <p>Every pet below is awaiting their forever home. Click any pet for full details or to submit an adoption request.</p>
+
+          <!-- Search & Filter Component -->
+          <div class="search-card">
+            <div class="search-input-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="pet-search-input" placeholder="Search by name, breed, or species (e.g., Labrador, Siamese, Milo)...">
+              <button class="btn btn-primary" id="search-btn">Search</button>
+              <button class="btn btn-ghost" id="search-clear-btn">Reset</button>
+            </div>
+
+            <!-- Species Filter Chips with REAL PHOTOS -->
+            <div class="species-chips-row">
+              <span class="chips-label">Filter:</span>
+              
+              <button class="species-chip active" data-species="all">
+                <span class="chip-avatar chip-avatar-icon">🐾</span>
+                <span>All Pets</span>
+              </button>
+
+              <button class="species-chip" data-species="Dog">
+                <span class="chip-avatar">
+                  <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=120&h=120&q=80" alt="Dogs">
+                </span>
+                <span>Dogs</span>
+              </button>
+
+              <button class="species-chip" data-species="Cat">
+                <span class="chip-avatar">
+                  <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=120&h=120&q=80" alt="Cats">
+                </span>
+                <span>Cats</span>
+              </button>
+
+              <button class="species-chip" data-species="Rabbit">
+                <span class="chip-avatar">
+                  <img src="https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=120&h=120&q=80" alt="Rabbits">
+                </span>
+                <span>Rabbits</span>
+              </button>
+
+              <button class="species-chip" data-species="Bird">
+                <span class="chip-avatar">
+                  <img src="https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=120&h=120&q=80" alt="Birds">
+                </span>
+                <span>Birds</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container pets-list-section">
+        <div class="pets-results-bar">
+          <div>
+            <h2 id="pets-results-title">Available Pets</h2>
+            <p id="pets-results-subtitle" class="text-muted">Showing all pets across shelters</p>
+          </div>
+          <button class="btn btn-outline btn-sm" id="pets-refresh-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+
+        <div class="pets-grid" id="pets-grid">
+          <!-- Dynamically populated by script.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: PET DETAIL VIEW -->
+    <section class="page hidden" data-page="pet-detail">
+      <div class="container pet-detail-container" id="pet-detail-box">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- VIEW 4: LOGIN -->
+    <section class="page hidden" data-page="login">
+      <div class="auth-container">
+        <div class="auth-card">
+          <div class="auth-header">
+            <div class="auth-brand-paw">🐾</div>
+            <h1>Welcome Back</h1>
+            <p>Log in to access your shelter dashboard or track adoption applications.</p>
+          </div>
+
+          <div id="login-error-alert" class="alert alert-danger hidden"></div>
+
+          <form id="login-form">
+            <div class="form-group">
+              <label for="login-email">Email Address</label>
+              <input type="email" id="login-email" required placeholder="name@example.com" autocomplete="email">
+            </div>
+
+            <div class="form-group">
+              <label for="login-password">Password</label>
+              <input type="password" id="login-password" required placeholder="••••••••" autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="login-submit-btn">
+              <span>Sign In</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+          </form>
+
+          <div class="auth-footer-prompt">
+            Don't have an account? <a href="#register" data-route="register">Sign up here</a>
+          </div>
+
+          <div class="auth-quick-tips">
+            <strong>Pro-tip:</strong> Log in with any registered <em>Shelter</em> email to instantly open that shelter's customized workspace!
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: REGISTER -->
+    <section class="page hidden" data-page="register">
+      <div class="auth-container">
+        <div class="auth-card">
+          <div class="auth-header">
+            <div class="auth-brand-paw">🐾</div>
+            <h1>Create Your Account</h1>
+            <p>Join PawMatch as a Shelter or Pet Adopter.</p>
+          </div>
+
+          <div id="register-error-alert" class="alert alert-danger hidden"></div>
+
+          <form id="register-form">
+            <div class="form-group">
+              <label for="register-name">Full Name or Shelter Org Name *</label>
+              <input type="text" id="register-name" required placeholder="e.g. Happy Paws Shelter or Sarah Jenkins">
+            </div>
+
+            <div class="form-group">
+              <label for="register-email">Email Address *</label>
+              <input type="email" id="register-email" required placeholder="contact@example.com" autocomplete="email">
+              <small class="form-hint">Each shelter email gets its own unique shelter dashboard.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="register-password">Password (min 6 characters) *</label>
+              <input type="password" id="register-password" required minlength="6" placeholder="••••••••" autocomplete="new-password">
+            </div>
+
+            <div class="form-group">
+              <label>Choose Account Role *</label>
+              <div class="role-cards-grid">
+                <label class="role-selector-card">
+                  <input type="radio" name="register-role" value="shelter" checked>
+                  <div class="role-card-inner">
+                    <span class="role-icon">🏠</span>
+                    <div class="role-info">
+                      <strong>Animal Shelter</strong>
+                      <small>List pets, manage applications</small>
+                    </div>
+                  </div>
+                </label>
+
+                <label class="role-selector-card">
+                  <input type="radio" name="register-role" value="adopter">
+                  <div class="role-card-inner">
+                    <span class="role-icon">🐶</span>
+                    <div class="role-info">
+                      <strong>Pet Adopter</strong>
+                      <small>Browse pets & apply to adopt</small>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="register-submit-btn">
+              <span>Create Account</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+          </form>
+
+          <div class="auth-footer-prompt">
+            Already have an account? <a href="#login" data-route="login">Log in here</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 6: DASHBOARD (ROUTED BY ROLE & SHELTER EMAIL) -->
+    <section class="page hidden" data-page="dashboard">
+      <div class="container dashboard-container" id="dashboard-wrapper">
+        <!-- Rendered dynamically by script.js based on role: Adopter vs Shelter Email -->
+      </div>
+    </section>
+
+    <!-- VIEW 7: ADOPTION APPLICATION FORM (FOR ADOPTER) -->
+    <section class="page hidden" data-page="apply">
+      <div class="container narrow-container">
+        <div class="card apply-card">
+          <div class="card-header">
+            <span class="eyebrow-text">Adoption Application</span>
+            <h1 id="apply-page-title">Apply to Adopt</h1>
+            <p>Send a message directly to the shelter caring for this pet.</p>
+          </div>
+
+          <div id="apply-pet-preview-card" class="apply-pet-preview">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div id="apply-error-alert" class="alert alert-danger hidden"></div>
+
+          <form id="adoption-application-form">
+            <div class="form-group">
+              <label for="apply-message">Why would you be a great match for this pet? *</label>
+              <textarea id="apply-message" rows="5" required placeholder="Tell the shelter about your home, previous experience with pets, work schedule, or why you fell in love with this pet..."></textarea>
+            </div>
+
+            <div class="form-actions-group">
+              <button type="submit" class="btn btn-primary btn-lg" id="submit-application-btn">
+                <span>Submit Adoption Request</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+              <a href="#pets" class="btn btn-ghost" data-route="pets">Cancel & Back to Pets</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 8: MY APPLICATIONS (FOR ADOPTERS) -->
+    <section class="page hidden" data-page="my-applications">
+      <div class="container">
+        <div class="dashboard-header-row">
+          <div>
+            <span class="eyebrow-text">Adopter Portal</span>
+            <h1>My Adoption Applications</h1>
+            <p class="text-muted">Track all adoption requests you have sent to rescue shelters.</p>
+          </div>
+          <button class="btn btn-outline btn-sm" id="refresh-my-apps-btn">↻ Refresh</button>
+        </div>
+
+        <div id="my-applications-list" class="applications-stream">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL 1: ADD NEW PET (FOR SHELTERS) -->
+  <div id="modal-add-pet" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h3>List a New Pet for Adoption</h3>
+          <p class="text-muted text-sm" id="modal-add-pet-shelter-info">Listing under your shelter organization</p>
+        </div>
+        <button class="modal-close-btn" id="modal-add-pet-close">&times;</button>
+      </div>
+
+      <form id="add-pet-form">
+        <div class="modal-body">
+          <div id="add-pet-error-alert" class="alert alert-danger hidden"></div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="add-pet-name">Pet Name *</label>
+              <input type="text" id="add-pet-name" required placeholder="e.g. Luna">
+            </div>
+
+            <div class="form-group">
+              <label for="add-pet-species">Species *</label>
+              <select id="add-pet-species" required onchange="onAddPetSpeciesChange(this.value)">
+                <option value="Dog">Dog</option>
+                <option value="Cat">Cat</option>
+                <option value="Rabbit">Rabbit</option>
+                <option value="Bird">Bird</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="add-pet-breed">Breed *</label>
+              <input type="text" id="add-pet-breed" required placeholder="e.g. Beagle / Domestic Shorthair">
+            </div>
+
+            <div class="form-group">
+              <label for="add-pet-age">Age (in years) *</label>
+              <input type="number" id="add-pet-age" min="0" max="30" step="0.5" required placeholder="2">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="add-pet-gender">Gender *</label>
+              <select id="add-pet-gender" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="add-pet-shelter-id">Shelter ID (Auto-bound)</label>
+              <input type="text" id="add-pet-shelter-id" required readonly class="input-readonly">
+              <small class="form-hint">Bound to your shelter profile</small>
+            </div>
+          </div>
+
+          <!-- Real Photo Selector for Pet -->
+          <div class="form-group">
+            <label>Select Real Pet Photo (or paste custom URL) *</label>
+            <div class="photo-picker-gallery" id="photo-picker-gallery">
+              <!-- Dynamically populated real photos -->
+            </div>
+            <input type="url" id="add-pet-image-url" placeholder="https://images.unsplash.com/..." class="mt-2">
+            <small class="form-hint">Pick a photo above or paste any direct image URL</small>
+          </div>
+
+          <div class="form-group">
+            <label for="add-pet-desc">Description & Personality</label>
+            <textarea id="add-pet-desc" rows="3" placeholder="Friendly, great with children, house-trained, up to date on vaccinations..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="add-pet-cancel-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="add-pet-submit-btn">
+            <span>Publish Pet Listing</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: EDIT PET (FOR SHELTERS) -->
+  <div id="modal-edit-pet" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Edit Pet Details</h3>
+        <button class="modal-close-btn" id="modal-edit-pet-close">&times;</button>
+      </div>
+
+      <form id="edit-pet-form">
+        <input type="hidden" id="edit-pet-id">
+        <div class="modal-body">
+          <div id="edit-pet-error-alert" class="alert alert-danger hidden"></div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-pet-name">Pet Name *</label>
+              <input type="text" id="edit-pet-name" required>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-pet-species">Species *</label>
+              <select id="edit-pet-species" required>
+                <option value="Dog">Dog</option>
+                <option value="Cat">Cat</option>
+                <option value="Rabbit">Rabbit</option>
+                <option value="Bird">Bird</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-pet-breed">Breed *</label>
+              <input type="text" id="edit-pet-breed" required>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-pet-age">Age (years) *</label>
+              <input type="number" id="edit-pet-age" min="0" max="30" step="0.5" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-pet-gender">Gender *</label>
+              <select id="edit-pet-gender" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-pet-desc">Description</label>
+            <textarea id="edit-pet-desc" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="edit-pet-cancel-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="edit-pet-submit-btn">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: API CONFIG -->
+  <div id="modal-api-config" class="modal-backdrop hidden">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <h3>Backend API Settings</h3>
+        <button class="modal-close-btn" id="modal-api-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-sm text-muted mb-3">PawMatch connects to the Node.js / Express backend. You can toggle between your local server and deployed server:</p>
+        <div class="form-group">
+          <label for="api-url-input">API Base URL</label>
+          <input type="text" id="api-url-input" value="http://localhost:5000/api">
+        </div>
+        <div class="api-presets-row">
+          <button type="button" class="btn btn-outline btn-sm" onclick="setApiPreset('http://localhost:5000/api')">Local :5000</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="setApiPreset('https://pawmatch-pj3x.onrender.com/api')">Render Cloud</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-block" id="api-save-btn">Save & Reconnect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-left">
+        <div class="brand">
+          <span class="brand-paw">🐾</span>
+          <span class="brand-text">PawMatch</span>
+        </div>
+        <p class="footer-tagline">Pet Adoption Platform • Connecting independent rescue shelters with adopters.</p>
+      </div>
+      <div class="footer-right">
+        <span>Node.js • Express • MongoDB • JWT • REST API</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

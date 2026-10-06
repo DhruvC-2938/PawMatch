@@ -26,8 +26,6 @@ router.get("/my", protect, getMyApplications);
 
 router.get("/user/:id", protect, getUserApplications);
 
-
-
 router.put(
     "/:id/status",
     protect,

@@ -15,8 +15,6 @@ const { validateRequiredFields } = require("../middleware/validationMiddleware")
 
 const router = express.Router();
 
-// Create a pet
-// Only authenticated shelter users can create pets
 router.post(
     "/",
     protect,
@@ -32,18 +30,12 @@ router.post(
     createPet
 );
 
-// Get all pets
 router.get("/", getPets);
 
-// Search pets
-// Keep this BEFORE /:id
 router.get("/search", searchPets);
 
-// Get pet by ID
 router.get("/:id", getPetById);
 
-// Update pet
-// Only authenticated shelter users can update pets
 router.put(
     "/:id",
     protect,
@@ -51,8 +43,6 @@ router.put(
     updatePet
 );
 
-// Delete pet
-// Only authenticated shelter users can delete pets
 router.delete(
     "/:id",
     protect,

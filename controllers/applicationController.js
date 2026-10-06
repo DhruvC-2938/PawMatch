@@ -36,6 +36,7 @@ const createApplication = async (req, res) => {
         });
     }
 };
+
 const getMyApplications = async (req, res) => {
     try {
         const applications = await Application.find({
@@ -57,6 +58,7 @@ const getMyApplications = async (req, res) => {
         });
     }
 };
+
 const getUserApplications = async (req, res) => {
     try {
         const userId = req.params.id;
@@ -88,6 +90,7 @@ const getUserApplications = async (req, res) => {
         });
     }
 };
+
 const updateApplicationStatus = async (req, res) => {
     try {
         const { status } = req.body;
