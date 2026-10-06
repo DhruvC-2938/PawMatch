@@ -1,0 +1,772 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "PawMatch REST API",
+    "description": "Comprehensive interactive API documentation for PawMatch — a pet adoption and animal rescue shelter management platform.\n\n### Authentication\nProtected routes require a JSON Web Token (JWT) in the `Authorization` header. Format: `Bearer <token>`.\nTokens can be generated via `/api/auth/login` or `/api/auth/register`.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Local development server"
+    },
+    {
+      "url": "/",
+      "description": "Current host"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "User authentication, registration, and profile endpoints"
+    },
+    {
+      "name": "Pets",
+      "description": "Pet discovery, search, and shelter pet management"
+    },
+    {
+      "name": "Shelters",
+      "description": "Animal rescue shelter management"
+    },
+    {
+      "name": "Applications",
+      "description": "Adoption applications and review lifecycle"
+    }
+  ],
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register a new user",
+        "description": "Creates a user account via Firebase Authentication and saves a corresponding profile in MongoDB with role 'adopter' or 'shelter'. Returns a JWT token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or user already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Log in an existing user",
+        "description": "Validates credentials against Firebase Identity Toolkit and issues a signed JWT token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing email or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User profile not found in database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/profile": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get authenticated user profile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pets": {
+      "get": {
+        "tags": ["Pets"],
+        "summary": "Fetch all available pets",
+        "description": "Public catalog endpoint listing all registered pets across all shelters.",
+        "responses": {
+          "200": {
+            "description": "List of pets retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "count": { "type": "integer", "example": 2 },
+                    "pets": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Pet" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Pets"],
+        "summary": "Create a new pet listing",
+        "description": "Restricted to authenticated users with role 'shelter'.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pet created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Pet created successfully" },
+                    "pet": { "$ref": "#/components/schemas/Pet" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - requires shelter role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pets/search": {
+      "get": {
+        "tags": ["Pets"],
+        "summary": "Search pets by keyword",
+        "description": "Performs case-insensitive regex search matching keyword against pet name, species, or breed.",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": true,
+            "description": "Search term (e.g. 'golden', 'cat', 'beagle')",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching pets returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "count": { "type": "integer", "example": 1 },
+                    "pets": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Pet" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Keyword parameter missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pets/{id}": {
+      "get": {
+        "tags": ["Pets"],
+        "summary": "Get pet by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Valid 24-character MongoDB ObjectId",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pet found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "pet": { "$ref": "#/components/schemas/Pet" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid pet ID format" },
+          "404": { "description": "Pet not found" }
+        }
+      },
+      "put": {
+        "tags": ["Pets"],
+        "summary": "Update an existing pet",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pet updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "pet": { "$ref": "#/components/schemas/Pet" }
+                  }
+                }
+              }
+            }
+          },
+          "403": { "description": "Forbidden - requires shelter role" },
+          "404": { "description": "Pet not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Pets"],
+        "summary": "Delete a pet listing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pet deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Pet deleted successfully" },
+                    "pet": { "$ref": "#/components/schemas/Pet" }
+                  }
+                }
+              }
+            }
+          },
+          "403": { "description": "Forbidden - requires shelter role" },
+          "404": { "description": "Pet not found" }
+        }
+      }
+    },
+    "/api/shelters": {
+      "post": {
+        "tags": ["Shelters"],
+        "summary": "Register a new animal shelter",
+        "description": "Restricted to authenticated users with role 'shelter'.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateShelterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Shelter registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Shelter created successfully" },
+                    "shelter": { "$ref": "#/components/schemas/Shelter" }
+                  }
+                }
+              }
+            }
+          },
+          "403": { "description": "Forbidden - requires shelter role" }
+        }
+      }
+    },
+    "/api/applications": {
+      "post": {
+        "tags": ["Applications"],
+        "summary": "Submit an adoption application",
+        "description": "Allows an authenticated user to submit an application for an animal.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApplicationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Adoption application submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Adoption application submitted successfully" },
+                    "application": { "$ref": "#/components/schemas/Application" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing petId" },
+          "404": { "description": "Pet not found" }
+        }
+      }
+    },
+    "/api/applications/my": {
+      "get": {
+        "tags": ["Applications"],
+        "summary": "Get all applications submitted by logged-in user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user applications",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "count": { "type": "integer", "example": 1 },
+                    "applications": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Application" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/user/{id}": {
+      "get": {
+        "tags": ["Applications"],
+        "summary": "Get applications by user ID",
+        "description": "Ensures the caller only accesses their own applications.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Applications retrieved successfully" },
+          "403": { "description": "Forbidden - Cannot access another user's applications" }
+        }
+      }
+    },
+    "/api/applications/{id}/status": {
+      "put": {
+        "tags": ["Applications"],
+        "summary": "Update application status (Shelters only)",
+        "description": "Allows shelter staff to approve or reject an adoption application.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Application status updated successfully" },
+                    "application": { "$ref": "#/components/schemas/Application" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid status (must be pending, approved, or rejected)" },
+          "403": { "description": "Forbidden - Requires shelter role" },
+          "404": { "description": "Application not found" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Enter your PawMatch JWT token obtained from /api/auth/login or /api/auth/register."
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "6702c2e0b5f81234567890ab" },
+          "firebaseUid": { "type": "string", "example": "gK84Xk91nPzQ..." },
+          "name": { "type": "string", "example": "Jane Doe" },
+          "email": { "type": "string", "example": "jane@example.com" },
+          "role": { "type": "string", "enum": ["adopter", "shelter"], "example": "adopter" }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": { "type": "string", "example": "Jane Doe" },
+          "email": { "type": "string", "example": "jane@example.com" },
+          "password": { "type": "string", "format": "password", "example": "Secret123!" },
+          "role": { "type": "string", "enum": ["adopter", "shelter"], "default": "adopter" }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "example": "jane@example.com" },
+          "password": { "type": "string", "format": "password", "example": "Secret123!" }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string", "example": "Login successful" },
+          "token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." },
+          "user": { "$ref": "#/components/schemas/User" }
+        }
+      },
+      "Pet": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "6702c3a5b5f81234567890ac" },
+          "name": { "type": "string", "example": "Buddy" },
+          "species": { "type": "string", "example": "Dog" },
+          "breed": { "type": "string", "example": "Golden Retriever" },
+          "age": { "type": "number", "example": 2 },
+          "gender": { "type": "string", "example": "Male" },
+          "description": { "type": "string", "example": "Playful, friendly, and great with kids." },
+          "shelterId": { "type": "string", "example": "6702c310b5f81234567890ad" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CreatePetRequest": {
+        "type": "object",
+        "required": ["name", "species", "breed", "age", "gender", "shelterId"],
+        "properties": {
+          "name": { "type": "string", "example": "Luna" },
+          "species": { "type": "string", "example": "Cat" },
+          "breed": { "type": "string", "example": "British Shorthair" },
+          "age": { "type": "number", "example": 1 },
+          "gender": { "type": "string", "example": "Female" },
+          "description": { "type": "string", "example": "Calm, affectionate indoor cat." },
+          "shelterId": { "type": "string", "example": "6702c310b5f81234567890ad" }
+        }
+      },
+      "UpdatePetRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "species": { "type": "string" },
+          "breed": { "type": "string" },
+          "age": { "type": "number" },
+          "gender": { "type": "string" },
+          "description": { "type": "string" },
+          "shelterId": { "type": "string" }
+        }
+      },
+      "Shelter": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "6702c310b5f81234567890ad" },
+          "name": { "type": "string", "example": "Happy Paws Rescue" },
+          "email": { "type": "string", "example": "info@happypaws.org" },
+          "address": { "type": "string", "example": "123 Sanctuary Way, Austin, TX" },
+          "phone": { "type": "string", "example": "+1-512-555-0199" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CreateShelterRequest": {
+        "type": "object",
+        "required": ["name", "email", "address"],
+        "properties": {
+          "name": { "type": "string", "example": "Happy Paws Rescue" },
+          "email": { "type": "string", "example": "info@happypaws.org" },
+          "address": { "type": "string", "example": "123 Sanctuary Way, Austin, TX" },
+          "phone": { "type": "string", "example": "+1-512-555-0199" }
+        }
+      },
+      "Application": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "6702c490b5f81234567890ae" },
+          "adopterId": { "type": "string", "example": "6702c2e0b5f81234567890ab" },
+          "petId": { "type": "string", "example": "6702c3a5b5f81234567890ac" },
+          "shelterId": { "type": "string", "example": "6702c310b5f81234567890ad" },
+          "status": { "type": "string", "enum": ["pending", "approved", "rejected"], "example": "pending" },
+          "message": { "type": "string", "example": "We have a large fenced yard and love retrievers." },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CreateApplicationRequest": {
+        "type": "object",
+        "required": ["petId"],
+        "properties": {
+          "petId": { "type": "string", "example": "6702c3a5b5f81234567890ac" },
+          "message": { "type": "string", "example": "We have a large fenced yard and love retrievers." }
+        }
+      },
+      "UpdateStatusRequest": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["pending", "approved", "rejected"],
+            "example": "approved"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string", "example": "Invalid email or password" },
+          "error": { "type": "string", "example": "EMAIL_NOT_FOUND" }
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string", "example": "Required fields are missing" },
+          "missingFields": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["name", "species", "shelterId"]
+          }
+        }
+      }
+    }
+  }
+}
